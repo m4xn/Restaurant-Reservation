@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<!-- dashboard.fxml — Dashboard with stat cards and recent books table -->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.bookstore.controller.DashboardController"
+      spacing="0" styleClass="view-root">
+
+    <!-- ── Page header ── -->
+    <HBox alignment="CENTER_LEFT" styleClass="page-header">
+        <VBox spacing="4">
+            <Label text="Dashboard" styleClass="page-title"/>
+            <Label text="Overview of your bookstore inventory" styleClass="page-subtitle"/>
+        </VBox>
+    </HBox>
+
+    <!-- ── Scrollable content ── -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="content-scroll">
+        <VBox spacing="28" styleClass="content-body">
+
+            <!-- ── Stat cards row ── -->
+            <VBox spacing="10">
+                <Label text="Quick Stats" styleClass="section-title"/>
+                <HBox spacing="16">
+
+                    <!-- Total Books -->
+                    <VBox spacing="16" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <HBox spacing="14" alignment="CENTER_LEFT">
+                            <Label text="📚" styleClass="stat-icon stat-icon-purple"/>
+                            <VBox spacing="4">
+                                <Label text="Total Books" styleClass="stat-label"/>
+                                <Label fx:id="totalBooksValue" text="—" styleClass="stat-value"/>
+                            </VBox>
+                        </HBox>
+                        <Label text="All titles in database" styleClass="stat-footer"/>
+                    </VBox>
+
+                    <!-- Total Stock -->
+                    <VBox spacing="16" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <HBox spacing="14" alignment="CENTER_LEFT">
+                            <Label text="📦" styleClass="stat-icon stat-icon-blue"/>
+                            <VBox spacing="4">
+                                <Label text="Total Stock" styleClass="stat-label"/>
+                                <Label fx:id="totalStockValue" text="—" styleClass="stat-value"/>
+                            </VBox>
+                        </HBox>
+                        <Label text="Units across all books" styleClass="stat-footer"/>
+                    </VBox>
+
+                    <!-- Categories -->
+                    <VBox spacing="16" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <HBox spacing="14" alignment="CENTER_LEFT">
+                            <Label text="🏷️" styleClass="stat-icon stat-icon-green"/>
+                            <VBox spacing="4">
+                                <Label text="Categories" styleClass="stat-label"/>
+                                <Label fx:id="categoriesValue" text="—" styleClass="stat-value"/>
+                            </VBox>
+                        </HBox>
+                        <Label text="Distinct genres" styleClass="stat-footer"/>
+                    </VBox>
+
+                    <!-- Out of Stock -->
+                    <VBox spacing="16" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <HBox spacing="14" alignment="CENTER_LEFT">
+                            <Label text="⚠️" styleClass="stat-icon stat-icon-red"/>
+                            <VBox spacing="4">
+                                <Label text="Out of Stock" styleClass="stat-label"/>
+                                <Label fx:id="outOfStockValue" text="—" styleClass="stat-value stat-value-danger"/>
+                            </VBox>
+                        </HBox>
+                        <Label text="Books needing restock" styleClass="stat-footer"/>
+                    </VBox>
+
+                </HBox>
+            </VBox>
+
+            <!-- ── Recent books section ── -->
+            <VBox spacing="12" styleClass="card">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Recent Additions" styleClass="section-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Latest 8 books" styleClass="text-muted"/>
+                </HBox>
+
+                <TableView fx:id="recentTable" prefHeight="320" styleClass="dark-table">
+                    <columns>
+                        <TableColumn fx:id="colTitle"    text="TITLE"    prefWidth="240"/>
+                        <TableColumn fx:id="colAuthor"   text="AUTHOR"   prefWidth="180"/>
+                        <TableColumn fx:id="colCategory" text="CATEGORY" prefWidth="130"/>
+                        <TableColumn fx:id="colPrice"    text="PRICE"    prefWidth="90"/>
+                        <TableColumn fx:id="colStock"    text="STOCK"    prefWidth="80"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="No recent books found." styleClass="table-placeholder"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+</VBox>

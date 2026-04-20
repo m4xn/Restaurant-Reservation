@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<!-- main.fxml — Shell layout: sidebar + dynamic content area -->
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.bookstore.controller.MainController"
+            fx:id="rootPane"
+            prefWidth="1280" prefHeight="800"
+            styleClass="root-pane">
+
+    <!-- ═══════════════════════ LEFT SIDEBAR ═══════════════════════ -->
+    <left>
+        <VBox prefWidth="230" spacing="0" styleClass="sidebar">
+
+            <!-- Logo -->
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="sidebar-logo">
+                <Label text="📚" styleClass="logo-icon"/>
+                <VBox spacing="2">
+                    <Label text="BookStore" styleClass="logo-title"/>
+                    <Label text="Management" styleClass="logo-subtitle"/>
+                </VBox>
+            </HBox>
+
+            <Separator styleClass="sidebar-separator"/>
+
+            <!-- Navigation section -->
+            <VBox spacing="4" styleClass="nav-section">
+                <Label text="MAIN MENU" styleClass="nav-section-label"/>
+
+                <!-- Dashboard -->
+                <HBox fx:id="navDashboard" spacing="14" alignment="CENTER_LEFT"
+                      styleClass="nav-item-active" onMouseClicked="#showDashboard">
+                    <Label text="⊞" styleClass="nav-icon"/>
+                    <Label text="Dashboard" styleClass="nav-label"/>
+                </HBox>
+
+                <!-- Books -->
+                <HBox fx:id="navBooks" spacing="14" alignment="CENTER_LEFT"
+                      styleClass="nav-item" onMouseClicked="#showBooks">
+                    <Label text="📖" styleClass="nav-icon"/>
+                    <Label text="All Books" styleClass="nav-label"/>
+                </HBox>
+
+                <!-- Add Book -->
+                <HBox fx:id="navAddBook" spacing="14" alignment="CENTER_LEFT"
+                      styleClass="nav-item" onMouseClicked="#showAddBook">
+                    <Label text="＋" styleClass="nav-icon"/>
+                    <Label text="Add Book" styleClass="nav-label"/>
+                </HBox>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <!-- Footer -->
+            <HBox spacing="12" alignment="CENTER_LEFT" styleClass="sidebar-footer">
+                <Label text="👤" styleClass="avatar-icon"/>
+                <VBox spacing="2">
+                    <Label text="Admin" styleClass="footer-name"/>
+                    <Label text="Administrator" styleClass="footer-role"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </left>
+
+    <!-- ═══════════════════ MAIN CONTENT AREA ═══════════════════════ -->
+    <!-- Dashboard / Books views are loaded dynamically into here -->
+    <center>
+        <StackPane fx:id="contentArea" styleClass="content-area"/>
+    </center>
+
+</BorderPane>

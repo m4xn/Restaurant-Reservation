@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<!-- add-edit-book.fxml — Modal dialog for adding and editing a book -->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.bookstore.controller.AddEditBookController"
+      spacing="0" prefWidth="560"
+      styleClass="dialog-root">
+
+    <!-- Dialog title bar -->
+    <HBox alignment="CENTER_LEFT" styleClass="dialog-header">
+        <Label fx:id="dialogTitleLabel" text="Add New Book" styleClass="dialog-title"/>
+    </HBox>
+
+    <!-- Form body -->
+    <VBox spacing="20" styleClass="dialog-body">
+
+        <!-- Row 1: Title (full width) -->
+        <VBox spacing="6">
+            <Label text="Title *" styleClass="field-label"/>
+            <TextField fx:id="titleField" promptText="Enter book title"
+                       styleClass="form-field"/>
+        </VBox>
+
+        <!-- Row 2: Author (full width) -->
+        <VBox spacing="6">
+            <Label text="Author *" styleClass="field-label"/>
+            <TextField fx:id="authorField" promptText="Enter author name"
+                       styleClass="form-field"/>
+        </VBox>
+
+        <!-- Row 3: Category + ISBN side by side -->
+        <HBox spacing="16">
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="Category *" styleClass="field-label"/>
+                <ComboBox fx:id="categoryCombo" promptText="Select category"
+                          maxWidth="Infinity" styleClass="form-combo"/>
+            </VBox>
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="ISBN" styleClass="field-label"/>
+                <TextField fx:id="isbnField" promptText="e.g. 9780132350884"
+                           styleClass="form-field"/>
+            </VBox>
+        </HBox>
+
+        <!-- Row 4: Price + Stock + Year -->
+        <HBox spacing="16">
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="Price ($) *" styleClass="field-label"/>
+                <TextField fx:id="priceField" promptText="0.00"
+                           styleClass="form-field"/>
+            </VBox>
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="Stock Qty *" styleClass="field-label"/>
+                <TextField fx:id="stockField" promptText="0"
+                           styleClass="form-field"/>
+            </VBox>
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="Pub. Year *" styleClass="field-label"/>
+                <TextField fx:id="yearField" promptText="e.g. 2023"
+                           styleClass="form-field"/>
+            </VBox>
+        </HBox>
+
+        <!-- Row 5: Description -->
+        <VBox spacing="6">
+            <Label text="Description" styleClass="field-label"/>
+            <TextArea fx:id="descriptionArea"
+                      promptText="Brief description of the book…"
+                      prefRowCount="3" wrapText="true"
+                      styleClass="form-textarea"/>
+        </VBox>
+
+        <!-- Validation error message (hidden until triggered) -->
+        <Label fx:id="errorLabel" text="" styleClass="error-label"
+               wrapText="true"/>
+
+    </VBox>
+
+    <!-- Action buttons -->
+    <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="dialog-footer">
+        <Button text="Cancel" styleClass="btn-secondary" onAction="#handleCancel"
+                prefWidth="110"/>
+        <Button fx:id="saveButton" text="Save Book" styleClass="btn-primary"
+                onAction="#handleSave" prefWidth="140"
+                defaultButton="true"/>
+    </HBox>
+
+</VBox>
