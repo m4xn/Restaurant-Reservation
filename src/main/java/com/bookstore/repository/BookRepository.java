@@ -4,6 +4,8 @@ import com.bookstore.model.Book;
 import com.bookstore.util.MongoDBUtil;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
@@ -90,6 +92,27 @@ public class BookRepository {
     }
 
     // ── Update ────────────────────────────────────────────────────────────────
+
+    /**
+     * Decrements stock by {@code quantity} only if current stock is at least {@code quantity}.
+     * @return true if the book was updated
+     */
+    public boolean decrementStockIfAvailable(ObjectId bookId, int quantity) {
+        if (quantity <= 0) {
+            return false;
+        }
+        Bson filter = Filters.and(
+            Filters.eq("_id", bookId),
+            Filters.gte("stockQuantity", quantity)
+        );
+        Bson update = Updates.inc("stockQuantity", -quantity);
+        Document updated = collection.findOneAndUpdate(
+            filter,
+            update,
+            new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
+        );
+        return updated != null;
+    }
 
     /** Updates all mutable fields of an existing book. */
     public void update(Book book) {

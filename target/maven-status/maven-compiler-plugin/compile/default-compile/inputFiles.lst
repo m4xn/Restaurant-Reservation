@@ -4,8 +4,11 @@
 /Users/mohamedsalem/Desktop/desktop/Projects/bookstore-javafx/src/main/java/com/bookstore/controller/BooksController.java
 /Users/mohamedsalem/Desktop/desktop/Projects/bookstore-javafx/src/main/java/com/bookstore/controller/DashboardController.java
 /Users/mohamedsalem/Desktop/desktop/Projects/bookstore-javafx/src/main/java/com/bookstore/controller/MainController.java
+/Users/mohamedsalem/Desktop/desktop/Projects/bookstore-javafx/src/main/java/com/bookstore/controller/SellBookController.java
 /Users/mohamedsalem/Desktop/desktop/Projects/bookstore-javafx/src/main/java/com/bookstore/model/Book.java
+/Users/mohamedsalem/Desktop/desktop/Projects/bookstore-javafx/src/main/java/com/bookstore/model/Sale.java
 /Users/mohamedsalem/Desktop/desktop/Projects/bookstore-javafx/src/main/java/com/bookstore/repository/BookRepository.java
+/Users/mohamedsalem/Desktop/desktop/Projects/bookstore-javafx/src/main/java/com/bookstore/repository/SaleRepository.java
 /Users/mohamedsalem/Desktop/desktop/Projects/bookstore-javafx/src/main/java/com/bookstore/service/BookService.java
 /Users/mohamedsalem/Desktop/desktop/Projects/bookstore-javafx/src/main/java/com/bookstore/util/AlertUtil.java
 /Users/mohamedsalem/Desktop/desktop/Projects/bookstore-javafx/src/main/java/com/bookstore/util/DashboardRefreshNotifier.java

@@ -24,6 +24,8 @@ public class DashboardController {
     @FXML private Label outOfStockValue;
     @FXML private Label lowStockValue;
     @FXML private Label inventoryValueLabel;
+    @FXML private Label totalSalesCountLabel;
+    @FXML private Label salesRevenueLabel;
 
     @FXML private TableView<Book>           recentTable;
     @FXML private TableColumn<Book, String> colTitle;
@@ -85,6 +87,8 @@ public class DashboardController {
             outOfStockValue.setText(String.valueOf(bookService.getOutOfStockCount()));
             lowStockValue.setText(String.valueOf(bookService.getLowStockCount()));
             inventoryValueLabel.setText(String.format("$%,.2f", bookService.getTotalInventoryValue()));
+            totalSalesCountLabel.setText(String.valueOf(bookService.getTotalSalesCount()));
+            salesRevenueLabel.setText(String.format("$%,.2f", bookService.getTotalSalesRevenue()));
         } catch (Exception e) {
             totalBooksValue.setText("—");
             totalStockValue.setText("—");
@@ -92,6 +96,8 @@ public class DashboardController {
             outOfStockValue.setText("—");
             lowStockValue.setText("—");
             inventoryValueLabel.setText("—");
+            totalSalesCountLabel.setText("—");
+            salesRevenueLabel.setText("—");
         }
     }
 

@@ -1,11 +1,13 @@
 com/bookstore/util/DashboardRefreshNotifier.class
 com/bookstore/controller/MainController.class
 com/bookstore/controller/DashboardController.class
+com/bookstore/model/Sale.class
 com/bookstore/controller/BooksController$4.class
 com/bookstore/controller/AddEditBookController.class
 module-info.class
 com/bookstore/service/BookService.class
 com/bookstore/controller/BooksController.class
+com/bookstore/repository/SaleRepository.class
 com/bookstore/controller/DashboardController$1.class
 com/bookstore/controller/BooksController$2.class
 com/bookstore/controller/BooksController$3.class
@@ -13,6 +15,7 @@ com/bookstore/util/AlertUtil.class
 com/bookstore/controller/BooksController$1.class
 com/bookstore/controller/BookDetailsController.class
 com/bookstore/controller/DashboardController$2.class
+com/bookstore/controller/SellBookController.class
 com/bookstore/MainApp.class
 com/bookstore/util/MongoDBUtil.class
 com/bookstore/repository/BookRepository.class

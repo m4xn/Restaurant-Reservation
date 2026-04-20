@@ -12,6 +12,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -118,26 +119,36 @@ public class BooksController {
             }
         });
 
-        booksTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        // Unconstrained: columns keep min/pref widths; horizontal scroll if the window is too narrow
+        // (keeps all four action buttons visible, including Delete on the right.)
+        booksTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        colActions.setMinWidth(268);
+        colActions.setPrefWidth(288);
     }
 
-    /** Adds View, Edit and Delete buttons to every row in the Actions column. */
+    /** Adds View, Sell, Edit and Delete buttons in one row per table cell. */
     private void configureActionsColumn() {
         colActions.setCellFactory(col -> new TableCell<>() {
             private final Button viewBtn   = new Button("View");
+            private final Button sellBtn   = new Button("Sell");
             private final Button editBtn   = new Button("Edit");
             private final Button deleteBtn = new Button("Delete");
-            private final HBox   box       = new HBox(8, viewBtn, editBtn, deleteBtn);
+            private final HBox   box       = new HBox(4, viewBtn, sellBtn, editBtn, deleteBtn);
 
             {
-                viewBtn.getStyleClass().add("btn-secondary");
-                editBtn.getStyleClass().add("btn-secondary");
-                deleteBtn.getStyleClass().add("btn-danger");
+                viewBtn.getStyleClass().addAll("btn-secondary", "table-row-action");
+                sellBtn.getStyleClass().addAll("btn-sell", "table-row-action");
+                editBtn.getStyleClass().addAll("btn-secondary", "table-row-action");
+                deleteBtn.getStyleClass().addAll("btn-danger", "table-row-action");
                 box.setStyle("-fx-alignment: CENTER;");
 
                 viewBtn.setOnAction(e -> {
                     Book book = getTableView().getItems().get(getIndex());
                     openDetailsDialog(book);
+                });
+                sellBtn.setOnAction(e -> {
+                    Book book = getTableView().getItems().get(getIndex());
+                    openSellDialog(book);
                 });
                 editBtn.setOnAction(e -> {
                     Book book = getTableView().getItems().get(getIndex());
@@ -152,7 +163,13 @@ public class BooksController {
             @Override
             protected void updateItem(Void v, boolean empty) {
                 super.updateItem(v, empty);
-                setGraphic(empty ? null : box);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    Book b = getTableView().getItems().get(getIndex());
+                    sellBtn.setDisable(b.getStockQuantity() <= 0);
+                    setGraphic(box);
+                }
             }
         });
     }
@@ -188,7 +205,7 @@ public class BooksController {
             updateResultCount(books.size());
             updateEmptyStateMessage(books.size());
         } catch (Exception e) {
-            AlertUtil.showError("Database Error", "Could not load books: " + e.getMessage());
+            AlertUtil.showError(ownerWindow(), "Database Error", "Could not load books: " + e.getMessage());
         }
     }
 
@@ -217,7 +234,7 @@ public class BooksController {
             updateResultCount(books.size());
             updateEmptyStateMessage(books.size());
         } catch (Exception e) {
-            AlertUtil.showError("Search Error", e.getMessage());
+            AlertUtil.showError(ownerWindow(), "Search Error", e.getMessage());
         }
     }
 
@@ -274,6 +291,7 @@ public class BooksController {
 
     private void handleDelete(Book book) {
         boolean confirmed = AlertUtil.showConfirmation(
+            ownerWindow(),
             "Delete Book",
             "Are you sure you want to delete \"" + book.getTitle() + "\"?\nThis cannot be undone."
         );
@@ -284,9 +302,9 @@ public class BooksController {
             loadBooks();
             loadCategoryFilter();
             com.bookstore.util.DashboardRefreshNotifier.notifyRefresh();
-            AlertUtil.showInfo("Deleted", "\"" + book.getTitle() + "\" has been deleted.");
+            AlertUtil.showInfo(ownerWindow(), "Deleted", "\"" + book.getTitle() + "\" has been deleted.");
         } catch (Exception e) {
-            AlertUtil.showError("Delete Failed", e.getMessage());
+            AlertUtil.showError(ownerWindow(), "Delete Failed", e.getMessage());
         }
     }
 
@@ -300,7 +318,13 @@ public class BooksController {
                 getClass().getResource("/com/bookstore/fxml/add-edit-book.fxml")
             );
             Stage dialog = new Stage();
-            dialog.initModality(Modality.APPLICATION_MODAL);
+            Window owner = ownerWindow();
+            if (owner != null) {
+                dialog.initOwner(owner);
+                dialog.initModality(Modality.WINDOW_MODAL);
+            } else {
+                dialog.initModality(Modality.APPLICATION_MODAL);
+            }
             dialog.setTitle(book == null ? "Add New Book" : "Edit Book");
             dialog.setResizable(false);
 
@@ -309,6 +333,7 @@ public class BooksController {
                 getClass().getResource("/com/bookstore/css/dark-theme.css").toExternalForm()
             );
             dialog.setScene(scene);
+            dialog.sizeToScene();
 
             AddEditBookController controller = loader.getController();
             controller.setDialogStage(dialog);
@@ -321,7 +346,44 @@ public class BooksController {
             loadCategoryFilter();
 
         } catch (IOException e) {
-            AlertUtil.showError("Error", "Could not open dialog: " + e.getMessage());
+            AlertUtil.showError(ownerWindow(), "Error", "Could not open dialog: " + e.getMessage());
+        }
+    }
+
+    private void openSellDialog(Book book) {
+        if (book == null || book.getId() == null) {
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/bookstore/fxml/sell-book.fxml")
+            );
+            Stage dialog = new Stage();
+            Window owner = ownerWindow();
+            if (owner != null) {
+                dialog.initOwner(owner);
+                dialog.initModality(Modality.WINDOW_MODAL);
+            } else {
+                dialog.initModality(Modality.APPLICATION_MODAL);
+            }
+            dialog.setTitle("Sell — " + book.getTitle());
+            dialog.setResizable(false);
+
+            Scene scene = new Scene(loader.load());
+            scene.getStylesheets().add(
+                getClass().getResource("/com/bookstore/css/dark-theme.css").toExternalForm()
+            );
+            dialog.setScene(scene);
+            dialog.sizeToScene();
+
+            SellBookController controller = loader.getController();
+            controller.setDialogStage(dialog);
+            controller.setBook(book);
+
+            dialog.showAndWait();
+            loadBooks();
+        } catch (IOException e) {
+            AlertUtil.showError(ownerWindow(), "Error", "Could not open sell dialog: " + e.getMessage());
         }
     }
 
@@ -331,7 +393,13 @@ public class BooksController {
                 getClass().getResource("/com/bookstore/fxml/book-details.fxml")
             );
             Stage dialog = new Stage();
-            dialog.initModality(Modality.APPLICATION_MODAL);
+            Window owner = ownerWindow();
+            if (owner != null) {
+                dialog.initOwner(owner);
+                dialog.initModality(Modality.WINDOW_MODAL);
+            } else {
+                dialog.initModality(Modality.APPLICATION_MODAL);
+            }
             dialog.setTitle("Book Details");
             dialog.setResizable(false);
 
@@ -340,6 +408,7 @@ public class BooksController {
                 getClass().getResource("/com/bookstore/css/dark-theme.css").toExternalForm()
             );
             dialog.setScene(scene);
+            dialog.sizeToScene();
 
             BookDetailsController controller = loader.getController();
             controller.setDialogStage(dialog);
@@ -347,8 +416,16 @@ public class BooksController {
 
             dialog.showAndWait();
         } catch (IOException e) {
-            AlertUtil.showError("Error", "Could not open details view: " + e.getMessage());
+            AlertUtil.showError(ownerWindow(), "Error", "Could not open details view: " + e.getMessage());
         }
+    }
+
+    /** Parent window for modals — required so dialogs stay compact when the app is maximized. */
+    private Window ownerWindow() {
+        if (booksTable != null && booksTable.getScene() != null) {
+            return booksTable.getScene().getWindow();
+        }
+        return null;
     }
 
     @FXML

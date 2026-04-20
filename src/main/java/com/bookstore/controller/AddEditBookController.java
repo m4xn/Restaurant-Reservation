@@ -6,6 +6,7 @@ import com.bookstore.util.AlertUtil;
 import com.bookstore.util.DashboardRefreshNotifier;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -23,6 +24,8 @@ public class AddEditBookController {
     @FXML private TextField titleField;
     @FXML private TextField authorField;
     @FXML private ComboBox<String> categoryCombo;
+    @FXML private VBox      customCategoryBox;
+    @FXML private TextField customCategoryField;
     @FXML private TextField priceField;
     @FXML private TextField stockField;
     @FXML private TextField isbnField;
@@ -40,6 +43,14 @@ public class AddEditBookController {
         loadCategories();
         errorLabel.setVisible(false);
         errorLabel.setManaged(false);
+        categoryCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
+            boolean showOther = "Other".equals(newVal);
+            customCategoryBox.setVisible(showOther);
+            customCategoryBox.setManaged(showOther);
+            if (!showOther) {
+                customCategoryField.clear();
+            }
+        });
     }
 
     // ── Public API (called by BooksController before showAndWait) ─────────────
@@ -58,17 +69,35 @@ public class AddEditBookController {
         if (book == null) {
             dialogTitleLabel.setText("Add New Book");
             saveButton.setText("Save Book");
+            customCategoryField.clear();
+            categoryCombo.setValue(null);
         } else {
             dialogTitleLabel.setText("Edit Book");
             saveButton.setText("Update Book");
             titleField.setText(book.getTitle());
             authorField.setText(book.getAuthor());
-            categoryCombo.setValue(book.getCategory());
+            applyCategoryForEdit(book.getCategory());
             priceField.setText(String.format("%.2f", book.getPrice()));
             stockField.setText(String.valueOf(book.getStockQuantity()));
             isbnField.setText(book.getIsbn());
             yearField.setText(String.valueOf(book.getPublicationYear()));
             descriptionArea.setText(book.getDescription());
+        }
+    }
+
+    /** Picks a combo value, or "Other" plus custom field when the stored category is not in the list. */
+    private void applyCategoryForEdit(String storedCategory) {
+        if (storedCategory == null || storedCategory.isBlank()) {
+            categoryCombo.setValue(null);
+            customCategoryField.clear();
+            return;
+        }
+        if (categoryCombo.getItems().contains(storedCategory)) {
+            categoryCombo.setValue(storedCategory);
+            customCategoryField.clear();
+        } else {
+            categoryCombo.setValue("Other");
+            customCategoryField.setText(storedCategory);
         }
     }
 
@@ -81,7 +110,7 @@ public class AddEditBookController {
         // ── Parse & validate ──────────────────────────────────────────────────
         String title    = titleField.getText().trim();
         String author   = authorField.getText().trim();
-        String category = categoryCombo.getValue();
+        String category = resolveCategoryFromForm();
         String isbn     = isbnField.getText().trim();
         String desc     = descriptionArea.getText().trim();
 
@@ -93,8 +122,7 @@ public class AddEditBookController {
             showError("Author cannot be empty.");
             return;
         }
-        if (category == null || category.isBlank()) {
-            showError("Category cannot be empty.");
+        if (category == null) {
             return;
         }
         if (isbn.isBlank()) {
@@ -142,17 +170,17 @@ public class AddEditBookController {
         try {
             if (existingBook == null) {
                 bookService.addBook(book);
-                AlertUtil.showInfo("Success", "\"" + title + "\" has been added.");
+                AlertUtil.showInfo(dialogStage, "Success", "\"" + title + "\" has been added.");
             } else {
                 bookService.updateBook(book);
-                AlertUtil.showInfo("Success", "\"" + title + "\" has been updated.");
+                AlertUtil.showInfo(dialogStage, "Success", "\"" + title + "\" has been updated.");
             }
             DashboardRefreshNotifier.notifyRefresh();
             dialogStage.close();
         } catch (IllegalArgumentException e) {
             showError(e.getMessage());
         } catch (Exception e) {
-            AlertUtil.showError("Database Error", e.getMessage());
+            AlertUtil.showError(dialogStage, "Database Error", e.getMessage());
         }
     }
 
@@ -167,6 +195,7 @@ public class AddEditBookController {
             titleField.clear();
             authorField.clear();
             categoryCombo.setValue(null);
+            customCategoryField.clear();
             priceField.clear();
             stockField.clear();
             isbnField.clear();
@@ -180,11 +209,33 @@ public class AddEditBookController {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
+    /**
+     * Resolves the category string for save.
+     * When "Other" is selected, uses {@link #customCategoryField} (must be non-blank).
+     * @return resolved category, or {@code null} if validation failed (error already shown)
+     */
+    private String resolveCategoryFromForm() {
+        String selected = categoryCombo.getValue();
+        if (selected == null || selected.isBlank()) {
+            showError("Category cannot be empty.");
+            return null;
+        }
+        if ("Other".equals(selected)) {
+            String custom = customCategoryField.getText().trim();
+            if (custom.isBlank()) {
+                showError("Please type your category name when \"Other\" is selected.");
+                return null;
+            }
+            return custom;
+        }
+        return selected;
+    }
+
     private void loadCategories() {
         List<String> predefined = List.of(
+            "Fiction", "Science", "Technology", "History", "Business", "Self-Help",
             "Programming", "Architecture", "Science Fiction", "Fantasy",
-            "Mystery", "Self-Help", "Biography", "History",
-            "Science", "Business", "Children", "Other"
+            "Mystery", "Biography", "Children", "Other"
         );
         categoryCombo.getItems().clear();
         categoryCombo.getItems().addAll(predefined);

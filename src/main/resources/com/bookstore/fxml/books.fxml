@@ -41,8 +41,11 @@
                   styleClass="filter-combo"/>
 
         <!-- Refresh -->
-        <Button text="↺" styleClass="btn-icon" onAction="#handleRefresh"
-                tooltip="Refresh"/>
+        <Button text="↺" styleClass="btn-icon" onAction="#handleRefresh">
+            <tooltip>
+                <Tooltip text="Refresh"/>
+            </tooltip>
+        </Button>
     </HBox>
 
     <!-- ── Books table ── -->
@@ -57,8 +60,8 @@
                 <TableColumn fx:id="colIsbn"     text="ISBN"     prefWidth="140" minWidth="120"/>
                 <TableColumn fx:id="colYear"     text="YEAR"     prefWidth="70"  minWidth="60"/>
                 <TableColumn fx:id="colStatus"   text="STATUS"   prefWidth="110" minWidth="95"/>
-                <TableColumn fx:id="colActions"  text="ACTIONS"  prefWidth="220" minWidth="200"
-                             sortable="false" resizable="false"/>
+                <TableColumn fx:id="colActions"  text="ACTIONS"  prefWidth="288" minWidth="268"
+                             sortable="false" resizable="true"/>
             </columns>
             <placeholder>
                 <VBox alignment="CENTER" spacing="12">

@@ -15,8 +15,11 @@
         <Label fx:id="dialogTitleLabel" text="Add New Book" styleClass="dialog-title"/>
     </HBox>
 
-    <!-- Form body -->
-    <VBox spacing="20" styleClass="dialog-body">
+    <!-- Scrollable form so "Other" + custom category never hides the footer buttons -->
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                prefViewportHeight="400" maxHeight="560" minViewportHeight="120"
+                styleClass="dialog-form-scroll" VBox.vgrow="ALWAYS">
+        <VBox spacing="20" styleClass="dialog-body">
 
         <!-- Row 1: Title (full width) -->
         <VBox spacing="6">
@@ -32,21 +35,26 @@
                        styleClass="form-field"/>
         </VBox>
 
-        <!-- Row 3: Category + ISBN side by side -->
-        <HBox spacing="16">
-            <VBox spacing="6" HBox.hgrow="ALWAYS">
-                <Label text="Category *" styleClass="field-label"/>
-                <ComboBox fx:id="categoryCombo" promptText="Select category"
-                          maxWidth="Infinity" styleClass="form-combo"/>
-            </VBox>
-            <VBox spacing="6" HBox.hgrow="ALWAYS">
-                <Label text="ISBN *" styleClass="field-label"/>
-                <TextField fx:id="isbnField" promptText="e.g. 9780132350884"
+        <!-- Row 3: Category (full width — custom name when "Other" is chosen) -->
+        <VBox spacing="6">
+            <Label text="Category *" styleClass="field-label"/>
+            <ComboBox fx:id="categoryCombo" promptText="Select category"
+                      maxWidth="Infinity" styleClass="form-combo"/>
+            <VBox fx:id="customCategoryBox" spacing="6" managed="false" visible="false">
+                <Label text="Your category *" styleClass="field-label"/>
+                <TextField fx:id="customCategoryField" promptText="Type the category name…"
                            styleClass="form-field"/>
             </VBox>
-        </HBox>
+        </VBox>
 
-        <!-- Row 4: Price + Stock + Year -->
+        <!-- Row 4: ISBN (full width so typed digits stay visible) -->
+        <VBox spacing="6">
+            <Label text="ISBN *" styleClass="field-label"/>
+            <TextField fx:id="isbnField" promptText="e.g. 9780132350884"
+                       styleClass="form-field"/>
+        </VBox>
+
+        <!-- Row 5: Price + Stock + Year -->
         <HBox spacing="16">
             <VBox spacing="6" HBox.hgrow="ALWAYS">
                 <Label text="Price ($) *" styleClass="field-label"/>
@@ -65,7 +73,7 @@
             </VBox>
         </HBox>
 
-        <!-- Row 5: Description -->
+        <!-- Row 6: Description -->
         <VBox spacing="6">
             <Label text="Description" styleClass="field-label"/>
             <TextArea fx:id="descriptionArea"
@@ -78,7 +86,8 @@
         <Label fx:id="errorLabel" text="" styleClass="error-label"
                wrapText="true"/>
 
-    </VBox>
+        </VBox>
+    </ScrollPane>
 
     <!-- Action buttons -->
     <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="dialog-footer">

@@ -1,9 +1,12 @@
 package com.bookstore.service;
 
 import com.bookstore.model.Book;
+import com.bookstore.model.Sale;
 import com.bookstore.repository.BookRepository;
+import com.bookstore.repository.SaleRepository;
 import org.bson.types.ObjectId;
 
+import java.time.Instant;
 import java.time.Year;
 import java.util.List;
 
@@ -14,9 +17,11 @@ import java.util.List;
 public class BookService {
 
     private final BookRepository repository;
+    private final SaleRepository saleRepository;
 
     public BookService() {
         this.repository = new BookRepository();
+        this.saleRepository = new SaleRepository();
     }
 
     // ── Initialization ────────────────────────────────────────────────────────
@@ -43,6 +48,12 @@ public class BookService {
     public long getLowStockCount()   { return repository.countLowStock(); }
     public double getTotalInventoryValue() { return repository.totalInventoryValue(); }
 
+    /** Number of recorded sale transactions. */
+    public long getTotalSalesCount() { return saleRepository.countAll(); }
+
+    /** Sum of all sale totals (revenue). */
+    public double getTotalSalesRevenue() { return saleRepository.totalRevenue(); }
+
     // ── Write ─────────────────────────────────────────────────────────────────
 
     /**
@@ -68,6 +79,33 @@ public class BookService {
     /** Deletes a book by ID. */
     public void deleteBook(ObjectId id) {
         repository.delete(id);
+    }
+
+    /**
+     * Records a customer purchase: inserts a {@link Sale} and decrements book stock.
+     * Status (In Stock / Low Stock / Out of Stock) is derived from updated stock on reload.
+     *
+     * @throws IllegalArgumentException if validation fails or stock is insufficient
+     */
+    public void sellBook(ObjectId bookId, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be a whole number greater than 0.");
+        }
+        Book book = repository.findById(bookId);
+        if (book == null) {
+            throw new IllegalArgumentException("Book not found.");
+        }
+        if (quantity > book.getStockQuantity()) {
+            throw new IllegalArgumentException(
+                "Quantity cannot be greater than available stock (" + book.getStockQuantity() + ").");
+        }
+        if (!repository.decrementStockIfAvailable(bookId, quantity)) {
+            throw new IllegalArgumentException("Could not complete sale — stock may have changed.");
+        }
+        double unitPrice = book.getPrice();
+        double total = unitPrice * quantity;
+        Sale sale = new Sale(bookId, book.getTitle(), quantity, unitPrice, total, Instant.now());
+        saleRepository.insert(sale);
     }
 
     // ── Validation ────────────────────────────────────────────────────────────

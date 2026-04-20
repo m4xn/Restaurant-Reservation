@@ -99,6 +99,30 @@
                         <Label text="Total value of all stocked books" styleClass="stat-footer"/>
                     </VBox>
                 </HBox>
+
+                <HBox spacing="16">
+                    <VBox spacing="16" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <HBox spacing="14" alignment="CENTER_LEFT">
+                            <Label text="🧾" styleClass="stat-icon stat-icon-purple"/>
+                            <VBox spacing="4">
+                                <Label text="Total Sales" styleClass="stat-label"/>
+                                <Label fx:id="totalSalesCountLabel" text="—" styleClass="stat-value"/>
+                            </VBox>
+                        </HBox>
+                        <Label text="Completed sale transactions" styleClass="stat-footer"/>
+                    </VBox>
+
+                    <VBox spacing="16" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <HBox spacing="14" alignment="CENTER_LEFT">
+                            <Label text="📈" styleClass="stat-icon stat-icon-green"/>
+                            <VBox spacing="4">
+                                <Label text="Sales Revenue" styleClass="stat-label"/>
+                                <Label fx:id="salesRevenueLabel" text="—" styleClass="stat-value"/>
+                            </VBox>
+                        </HBox>
+                        <Label text="Sum of all customer purchases" styleClass="stat-footer"/>
+                    </VBox>
+                </HBox>
             </VBox>
 
             <!-- ── Recent books section ── -->

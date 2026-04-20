@@ -353,6 +353,28 @@
     -fx-text-fill: white;
 }
 
+/* Sell / positive action */
+.btn-sell {
+    -fx-background-color: #14532D;
+    -fx-text-fill: #3FB950;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-background-radius: 7;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+    -fx-border-color: #238636;
+    -fx-border-radius: 7;
+}
+
+.btn-sell:hover {
+    -fx-background-color: #1A3D26;
+}
+
+.btn-sell:disabled {
+    -fx-opacity: 0.35;
+    -fx-cursor: default;
+}
+
 .btn-icon {
     -fx-background-color: #21262D;
     -fx-text-fill: #8B949E;
@@ -485,6 +507,12 @@
     -fx-text-fill: #F0F6FC;
 }
 
+/* Compact row actions so View / Sell / Edit / Delete stay visible on smaller widths */
+.dark-table .table-row-action {
+    -fx-padding: 5 7;
+    -fx-font-size: 11px;
+}
+
 /* Remove default table focus ring */
 .dark-table:focused {
     -fx-background-color: transparent;
@@ -541,6 +569,28 @@
     -fx-spacing: 18;
 }
 
+/* Scrollable middle of add/edit dialog — keeps footer visible when content grows */
+.dialog-form-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-color: transparent transparent #30363D transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.dialog-form-scroll > .viewport {
+    -fx-background-color: #161B22;
+}
+
+.dialog-form-scroll .scroll-bar:vertical {
+    -fx-background-color: #161B22;
+}
+
+.dialog-form-scroll .scroll-bar .thumb {
+    -fx-background-color: #30363D;
+    -fx-background-radius: 4;
+}
+
 .dialog-footer {
     -fx-padding: 16 28 24 28;
     -fx-border-color: #30363D transparent transparent transparent;
@@ -570,6 +620,11 @@
 .form-field:focused {
     -fx-border-color: #7C3AED;
     -fx-background-color: #21262D;
+}
+
+/* Inner text node (some platforms/themes ignore -fx-text-fill on the control alone) */
+.form-field .text {
+    -fx-fill: #F0F6FC;
 }
 
 .form-textarea {
