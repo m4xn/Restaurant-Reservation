@@ -4,6 +4,7 @@ import com.bookstore.model.Book;
 import com.bookstore.repository.BookRepository;
 import org.bson.types.ObjectId;
 
+import java.time.Year;
 import java.util.List;
 
 /**
@@ -39,6 +40,8 @@ public class BookService {
     public long getTotalStock()      { return repository.totalStock(); }
     public long getTotalCategories() { return repository.countCategories(); }
     public long getOutOfStockCount() { return repository.countOutOfStock(); }
+    public long getLowStockCount()   { return repository.countLowStock(); }
+    public double getTotalInventoryValue() { return repository.totalInventoryValue(); }
 
     // ── Write ─────────────────────────────────────────────────────────────────
 
@@ -76,11 +79,14 @@ public class BookService {
             throw new IllegalArgumentException("Author is required.");
         if (book.getCategory() == null || book.getCategory().isBlank())
             throw new IllegalArgumentException("Category is required.");
+        if (book.getIsbn() == null || book.getIsbn().isBlank())
+            throw new IllegalArgumentException("ISBN is required.");
         if (book.getPrice() < 0)
             throw new IllegalArgumentException("Price cannot be negative.");
         if (book.getStockQuantity() < 0)
             throw new IllegalArgumentException("Stock quantity cannot be negative.");
-        if (book.getPublicationYear() < 1000 || book.getPublicationYear() > 2100)
-            throw new IllegalArgumentException("Publication year must be between 1000 and 2100.");
+        int currentYear = Year.now().getValue();
+        if (book.getPublicationYear() < 1450 || book.getPublicationYear() > currentYear + 1)
+            throw new IllegalArgumentException("Publication year must be between 1450 and " + (currentYear + 1) + ".");
     }
 }

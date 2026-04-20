@@ -2,6 +2,7 @@ package com.bookstore.controller;
 
 import com.bookstore.model.Book;
 import com.bookstore.service.BookService;
+import com.bookstore.util.DashboardRefreshNotifier;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -21,6 +22,8 @@ public class DashboardController {
     @FXML private Label totalStockValue;
     @FXML private Label categoriesValue;
     @FXML private Label outOfStockValue;
+    @FXML private Label lowStockValue;
+    @FXML private Label inventoryValueLabel;
 
     @FXML private TableView<Book>           recentTable;
     @FXML private TableColumn<Book, String> colTitle;
@@ -34,8 +37,8 @@ public class DashboardController {
     @FXML
     private void initialize() {
         configureTable();
-        loadStats();
-        loadRecentBooks();
+        refreshData();
+        DashboardRefreshNotifier.subscribe(this::refreshData);
     }
 
     private void configureTable() {
@@ -80,11 +83,15 @@ public class DashboardController {
             totalStockValue.setText(String.valueOf(bookService.getTotalStock()));
             categoriesValue.setText(String.valueOf(bookService.getTotalCategories()));
             outOfStockValue.setText(String.valueOf(bookService.getOutOfStockCount()));
+            lowStockValue.setText(String.valueOf(bookService.getLowStockCount()));
+            inventoryValueLabel.setText(String.format("$%,.2f", bookService.getTotalInventoryValue()));
         } catch (Exception e) {
             totalBooksValue.setText("—");
             totalStockValue.setText("—");
             categoriesValue.setText("—");
             outOfStockValue.setText("—");
+            lowStockValue.setText("—");
+            inventoryValueLabel.setText("—");
         }
     }
 
@@ -95,5 +102,10 @@ public class DashboardController {
         } catch (Exception e) {
             recentTable.setPlaceholder(new Label("Could not connect to MongoDB."));
         }
+    }
+
+    private void refreshData() {
+        loadStats();
+        loadRecentBooks();
     }
 }

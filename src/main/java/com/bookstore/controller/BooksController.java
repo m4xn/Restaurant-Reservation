@@ -14,6 +14,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -25,7 +26,9 @@ public class BooksController {
     // ── Toolbar ───────────────────────────────────────────────────────────────
     @FXML private TextField         searchField;
     @FXML private ComboBox<String>  categoryFilter;
+    @FXML private ComboBox<String>  sortCombo;
     @FXML private Label             resultCountLabel;
+    @FXML private Label             emptyStateTitleLabel;
 
     // ── Table ─────────────────────────────────────────────────────────────────
     @FXML private TableView<Book>            booksTable;
@@ -36,6 +39,7 @@ public class BooksController {
     @FXML private TableColumn<Book, Integer> colStock;
     @FXML private TableColumn<Book, String>  colIsbn;
     @FXML private TableColumn<Book, Integer> colYear;
+    @FXML private TableColumn<Book, String>  colStatus;
     @FXML private TableColumn<Book, Void>    colActions;
 
     private final BookService bookService = new BookService();
@@ -44,12 +48,14 @@ public class BooksController {
     private void initialize() {
         configureColumns();
         configureActionsColumn();
+        configureSortOptions();
         loadCategoryFilter();
         loadBooks();
 
         // Live search as the user types
         searchField.textProperty().addListener((obs, oldVal, newVal) -> filterBooks());
         categoryFilter.valueProperty().addListener((obs, oldVal, newVal) -> filterBooks());
+        sortCombo.valueProperty().addListener((obs, oldVal, newVal) -> filterBooks());
     }
 
     // ── Table setup ───────────────────────────────────────────────────────────
@@ -62,6 +68,7 @@ public class BooksController {
         colStock.setCellValueFactory(new PropertyValueFactory<>("stockQuantity"));
         colIsbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
         colYear.setCellValueFactory(new PropertyValueFactory<>("publicationYear"));
+        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         // Format price
         colPrice.setCellFactory(col -> new TableCell<>() {
@@ -91,21 +98,47 @@ public class BooksController {
             }
         });
 
+        colStatus.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
+                    setText(null);
+                    setStyle("");
+                    return;
+                }
+                setText(status);
+                if ("Out of Stock".equals(status)) {
+                    setStyle("-fx-text-fill: #F85149; -fx-font-weight: bold;");
+                } else if ("Low Stock".equals(status)) {
+                    setStyle("-fx-text-fill: #FBBF24; -fx-font-weight: bold;");
+                } else {
+                    setStyle("-fx-text-fill: #3FB950; -fx-font-weight: bold;");
+                }
+            }
+        });
+
         booksTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
     }
 
-    /** Adds Edit and Delete buttons to every row in the Actions column. */
+    /** Adds View, Edit and Delete buttons to every row in the Actions column. */
     private void configureActionsColumn() {
         colActions.setCellFactory(col -> new TableCell<>() {
+            private final Button viewBtn   = new Button("View");
             private final Button editBtn   = new Button("Edit");
             private final Button deleteBtn = new Button("Delete");
-            private final HBox   box       = new HBox(8, editBtn, deleteBtn);
+            private final HBox   box       = new HBox(8, viewBtn, editBtn, deleteBtn);
 
             {
+                viewBtn.getStyleClass().add("btn-secondary");
                 editBtn.getStyleClass().add("btn-secondary");
                 deleteBtn.getStyleClass().add("btn-danger");
                 box.setStyle("-fx-alignment: CENTER;");
 
+                viewBtn.setOnAction(e -> {
+                    Book book = getTableView().getItems().get(getIndex());
+                    openDetailsDialog(book);
+                });
                 editBtn.setOnAction(e -> {
                     Book book = getTableView().getItems().get(getIndex());
                     openEditDialog(book);
@@ -124,6 +157,19 @@ public class BooksController {
         });
     }
 
+    private void configureSortOptions() {
+        sortCombo.getItems().setAll(
+            "Title (A-Z)",
+            "Title (Z-A)",
+            "Price (Low to High)",
+            "Price (High to Low)",
+            "Stock (Low to High)",
+            "Stock (High to Low)",
+            "Year (Newest)"
+        );
+        sortCombo.setValue("Title (A-Z)");
+    }
+
     private void loadCategoryFilter() {
         List<String> cats = bookService.getAllCategories();
         categoryFilter.getItems().clear();
@@ -137,8 +183,10 @@ public class BooksController {
     private void loadBooks() {
         try {
             List<Book> books = bookService.getAllBooks();
+            books = applySort(books);
             booksTable.setItems(FXCollections.observableArrayList(books));
             updateResultCount(books.size());
+            updateEmptyStateMessage(books.size());
         } catch (Exception e) {
             AlertUtil.showError("Database Error", "Could not load books: " + e.getMessage());
         }
@@ -159,12 +207,15 @@ public class BooksController {
             // Apply category filter client-side after the search
             if (category != null && !category.equals("All Categories")) {
                 books = books.stream()
-                             .filter(b -> category.equals(b.getCategory()))
+                             .filter(b -> category.equalsIgnoreCase(b.getCategory()))
                              .toList();
             }
 
+            books = applySort(books);
+
             booksTable.setItems(FXCollections.observableArrayList(books));
             updateResultCount(books.size());
+            updateEmptyStateMessage(books.size());
         } catch (Exception e) {
             AlertUtil.showError("Search Error", e.getMessage());
         }
@@ -172,6 +223,42 @@ public class BooksController {
 
     private void updateResultCount(int count) {
         resultCountLabel.setText(count + " book" + (count != 1 ? "s" : ""));
+    }
+
+    private List<Book> applySort(List<Book> books) {
+        String selectedSort = sortCombo.getValue();
+        Comparator<Book> comparator;
+
+        if ("Title (Z-A)".equals(selectedSort)) {
+            comparator = Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER).reversed();
+        } else if ("Price (Low to High)".equals(selectedSort)) {
+            comparator = Comparator.comparingDouble(Book::getPrice);
+        } else if ("Price (High to Low)".equals(selectedSort)) {
+            comparator = Comparator.comparingDouble(Book::getPrice).reversed();
+        } else if ("Stock (Low to High)".equals(selectedSort)) {
+            comparator = Comparator.comparingInt(Book::getStockQuantity);
+        } else if ("Stock (High to Low)".equals(selectedSort)) {
+            comparator = Comparator.comparingInt(Book::getStockQuantity).reversed();
+        } else if ("Year (Newest)".equals(selectedSort)) {
+            comparator = Comparator.comparingInt(Book::getPublicationYear).reversed();
+        } else {
+            comparator = Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER);
+        }
+
+        return books.stream().sorted(comparator).toList();
+    }
+
+    private void updateEmptyStateMessage(int count) {
+        if (emptyStateTitleLabel == null || count > 0) {
+            return;
+        }
+
+        boolean hasFilters = !searchField.getText().isBlank()
+            || (categoryFilter.getValue() != null && !"All Categories".equals(categoryFilter.getValue()));
+
+        emptyStateTitleLabel.setText(hasFilters
+            ? "No books found"
+            : "Add your first book to get started");
     }
 
     // ── CRUD handlers ─────────────────────────────────────────────────────────
@@ -196,6 +283,7 @@ public class BooksController {
             bookService.deleteBook(book.getId());
             loadBooks();
             loadCategoryFilter();
+            com.bookstore.util.DashboardRefreshNotifier.notifyRefresh();
             AlertUtil.showInfo("Deleted", "\"" + book.getTitle() + "\" has been deleted.");
         } catch (Exception e) {
             AlertUtil.showError("Delete Failed", e.getMessage());
@@ -237,10 +325,37 @@ public class BooksController {
         }
     }
 
+    private void openDetailsDialog(Book book) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/bookstore/fxml/book-details.fxml")
+            );
+            Stage dialog = new Stage();
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.setTitle("Book Details");
+            dialog.setResizable(false);
+
+            Scene scene = new Scene(loader.load());
+            scene.getStylesheets().add(
+                getClass().getResource("/com/bookstore/css/dark-theme.css").toExternalForm()
+            );
+            dialog.setScene(scene);
+
+            BookDetailsController controller = loader.getController();
+            controller.setDialogStage(dialog);
+            controller.setBook(book);
+
+            dialog.showAndWait();
+        } catch (IOException e) {
+            AlertUtil.showError("Error", "Could not open details view: " + e.getMessage());
+        }
+    }
+
     @FXML
     private void handleRefresh() {
         searchField.clear();
         categoryFilter.setValue("All Categories");
+        sortCombo.setValue("Title (A-Z)");
         loadBooks();
         loadCategoryFilter();
     }

@@ -25,7 +25,7 @@
         <HBox spacing="8" alignment="CENTER_LEFT" styleClass="search-box" HBox.hgrow="ALWAYS">
             <Label text="🔍" styleClass="search-icon"/>
             <TextField fx:id="searchField"
-                       promptText="Search by title, author, or ISBN…"
+                       promptText="Search by title, author, category, or ISBN..."
                        styleClass="search-field" HBox.hgrow="ALWAYS"/>
         </HBox>
 
@@ -33,6 +33,11 @@
         <ComboBox fx:id="categoryFilter"
                   promptText="All Categories"
                   prefWidth="180"
+                  styleClass="filter-combo"/>
+
+        <ComboBox fx:id="sortCombo"
+                  promptText="Sort By"
+                  prefWidth="190"
                   styleClass="filter-combo"/>
 
         <!-- Refresh -->
@@ -51,13 +56,14 @@
                 <TableColumn fx:id="colStock"    text="STOCK"    prefWidth="80"  minWidth="60"/>
                 <TableColumn fx:id="colIsbn"     text="ISBN"     prefWidth="140" minWidth="120"/>
                 <TableColumn fx:id="colYear"     text="YEAR"     prefWidth="70"  minWidth="60"/>
-                <TableColumn fx:id="colActions"  text="ACTIONS"  prefWidth="160" minWidth="140"
+                <TableColumn fx:id="colStatus"   text="STATUS"   prefWidth="110" minWidth="95"/>
+                <TableColumn fx:id="colActions"  text="ACTIONS"  prefWidth="220" minWidth="200"
                              sortable="false" resizable="false"/>
             </columns>
             <placeholder>
                 <VBox alignment="CENTER" spacing="12">
                     <Label text="📭" style="-fx-font-size: 40px;"/>
-                    <Label text="No books found" styleClass="table-placeholder"/>
+                    <Label fx:id="emptyStateTitleLabel" text="No books found" styleClass="table-placeholder"/>
                     <Label text="Try a different search or add a new book."
                            styleClass="text-muted"/>
                 </VBox>

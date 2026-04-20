@@ -99,6 +99,19 @@ public class Book {
     public String   getDescription()               { return description; }
     public void     setDescription(String desc)    { this.description = desc; }
 
+    /**
+     * Derived inventory status used by table views and badges.
+     */
+    public String getStatus() {
+        if (stockQuantity <= 0) {
+            return "Out of Stock";
+        }
+        if (stockQuantity <= 5) {
+            return "Low Stock";
+        }
+        return "In Stock";
+    }
+
     @Override
     public String toString() {
         return "Book{id=" + getIdString() + ", title='" + title + "'}";

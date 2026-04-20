@@ -48,12 +48,13 @@ public class BookRepository {
         return books;
     }
 
-    /** Returns books whose title, author, or ISBN match the search term (case-insensitive). */
+    /** Returns books whose title, author, category, or ISBN match the search term (case-insensitive). */
     public List<Book> search(String term) {
         Pattern regex = Pattern.compile(Pattern.quote(term), Pattern.CASE_INSENSITIVE);
         Bson filter = Filters.or(
             Filters.regex("title",  regex),
             Filters.regex("author", regex),
+            Filters.regex("category", regex),
             Filters.regex("isbn",   regex)
         );
         List<Book> books = new ArrayList<>();
@@ -138,6 +139,25 @@ public class BookRepository {
     /** Number of books with stock quantity of 0. */
     public long countOutOfStock() {
         return collection.countDocuments(Filters.lte("stockQuantity", 0));
+    }
+
+    /** Number of books with low stock (1..5). */
+    public long countLowStock() {
+        return collection.countDocuments(
+            Filters.and(Filters.gt("stockQuantity", 0), Filters.lte("stockQuantity", 5))
+        );
+    }
+
+    /** Total inventory value = sum(price * stockQuantity). */
+    public double totalInventoryValue() {
+        List<Document> pipeline = List.of(
+            new Document("$project", new Document("lineValue",
+                new Document("$multiply", List.of("$price", "$stockQuantity")))),
+            new Document("$group", new Document("_id", null)
+                .append("total", new Document("$sum", "$lineValue")))
+        );
+        Document result = collection.aggregate(pipeline).first();
+        return result != null ? ((Number) result.get("total")).doubleValue() : 0.0;
     }
 
     /** All distinct category values, sorted. */

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.bookstore.controller.BookDetailsController"
+      spacing="0" prefWidth="560"
+      styleClass="dialog-root">
+
+    <HBox alignment="CENTER_LEFT" styleClass="dialog-header">
+        <Label text="Book Details" styleClass="dialog-title"/>
+    </HBox>
+
+    <VBox spacing="14" styleClass="dialog-body">
+        <GridPane hgap="16" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints prefWidth="130"/>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <Label text="Title" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label fx:id="titleValue" styleClass="detail-value" wrapText="true" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Author" styleClass="field-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Label fx:id="authorValue" styleClass="detail-value" wrapText="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+            <Label text="Category" styleClass="field-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <Label fx:id="categoryValue" styleClass="detail-value" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <Label text="Price" styleClass="field-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <Label fx:id="priceValue" styleClass="detail-value" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            <Label text="Stock Quantity" styleClass="field-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <Label fx:id="stockValue" styleClass="detail-value" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+            <Label text="Status" styleClass="field-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+            <Label fx:id="statusValue" styleClass="detail-value" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+            <Label text="ISBN" styleClass="field-label" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+            <Label fx:id="isbnValue" styleClass="detail-value" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+            <Label text="Publication Year" styleClass="field-label" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+            <Label fx:id="yearValue" styleClass="detail-value" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+        </GridPane>
+
+        <VBox spacing="6">
+            <Label text="Description" styleClass="field-label"/>
+            <Label fx:id="descriptionValue" styleClass="detail-description" wrapText="true"/>
+        </VBox>
+    </VBox>
+
+    <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="dialog-footer">
+        <Button text="Close" styleClass="btn-primary" onAction="#handleClose"
+                prefWidth="120" defaultButton="true"/>
+    </HBox>
+
+</VBox>

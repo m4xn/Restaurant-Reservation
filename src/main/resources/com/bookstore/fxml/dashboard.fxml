@@ -75,6 +75,30 @@
                     </VBox>
 
                 </HBox>
+
+                <HBox spacing="16">
+                    <VBox spacing="16" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <HBox spacing="14" alignment="CENTER_LEFT">
+                            <Label text="🟡" styleClass="stat-icon stat-icon-orange"/>
+                            <VBox spacing="4">
+                                <Label text="Low Stock" styleClass="stat-label"/>
+                                <Label fx:id="lowStockValue" text="—" styleClass="stat-value"/>
+                            </VBox>
+                        </HBox>
+                        <Label text="Books with 1-5 units left" styleClass="stat-footer"/>
+                    </VBox>
+
+                    <VBox spacing="16" HBox.hgrow="ALWAYS" styleClass="stat-card">
+                        <HBox spacing="14" alignment="CENTER_LEFT">
+                            <Label text="💰" styleClass="stat-icon stat-icon-teal"/>
+                            <VBox spacing="4">
+                                <Label text="Inventory Value" styleClass="stat-label"/>
+                                <Label fx:id="inventoryValueLabel" text="—" styleClass="stat-value"/>
+                            </VBox>
+                        </HBox>
+                        <Label text="Total value of all stocked books" styleClass="stat-footer"/>
+                    </VBox>
+                </HBox>
             </VBox>
 
             <!-- ── Recent books section ── -->
@@ -94,7 +118,10 @@
                         <TableColumn fx:id="colStock"    text="STOCK"    prefWidth="80"/>
                     </columns>
                     <placeholder>
-                        <Label text="No recent books found." styleClass="table-placeholder"/>
+                        <VBox alignment="CENTER" spacing="8">
+                            <Label text="No recent books found." styleClass="table-placeholder"/>
+                            <Label text="Add your first book to get started." styleClass="text-muted"/>
+                        </VBox>
                     </placeholder>
                 </TableView>
             </VBox>

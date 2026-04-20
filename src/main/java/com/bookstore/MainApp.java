@@ -1,5 +1,6 @@
 package com.bookstore;
 
+import com.bookstore.service.BookService;
 import com.bookstore.util.MongoDBUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +16,9 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        // Ensure sample books are inserted only for first run.
+        new BookService().initialize();
+
         FXMLLoader loader = new FXMLLoader(
             getClass().getResource("/com/bookstore/fxml/main.fxml")
         );

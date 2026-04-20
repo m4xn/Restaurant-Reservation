@@ -40,7 +40,7 @@
                           maxWidth="Infinity" styleClass="form-combo"/>
             </VBox>
             <VBox spacing="6" HBox.hgrow="ALWAYS">
-                <Label text="ISBN" styleClass="field-label"/>
+                <Label text="ISBN *" styleClass="field-label"/>
                 <TextField fx:id="isbnField" promptText="e.g. 9780132350884"
                            styleClass="form-field"/>
             </VBox>
@@ -82,6 +82,8 @@
 
     <!-- Action buttons -->
     <HBox spacing="12" alignment="CENTER_RIGHT" styleClass="dialog-footer">
+        <Button text="Reset" styleClass="btn-secondary" onAction="#handleReset"
+                prefWidth="110"/>
         <Button text="Cancel" styleClass="btn-secondary" onAction="#handleCancel"
                 prefWidth="110"/>
         <Button fx:id="saveButton" text="Save Book" styleClass="btn-primary"

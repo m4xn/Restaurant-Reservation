@@ -3,6 +3,7 @@ package com.bookstore.controller;
 import com.bookstore.model.Book;
 import com.bookstore.service.BookService;
 import com.bookstore.util.AlertUtil;
+import com.bookstore.util.DashboardRefreshNotifier;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -84,6 +85,23 @@ public class AddEditBookController {
         String isbn     = isbnField.getText().trim();
         String desc     = descriptionArea.getText().trim();
 
+        if (title.isBlank()) {
+            showError("Title cannot be empty.");
+            return;
+        }
+        if (author.isBlank()) {
+            showError("Author cannot be empty.");
+            return;
+        }
+        if (category == null || category.isBlank()) {
+            showError("Category cannot be empty.");
+            return;
+        }
+        if (isbn.isBlank()) {
+            showError("ISBN cannot be empty.");
+            return;
+        }
+
         double price;
         int    stock;
         int    year;
@@ -129,6 +147,7 @@ public class AddEditBookController {
                 bookService.updateBook(book);
                 AlertUtil.showInfo("Success", "\"" + title + "\" has been updated.");
             }
+            DashboardRefreshNotifier.notifyRefresh();
             dialogStage.close();
         } catch (IllegalArgumentException e) {
             showError(e.getMessage());
@@ -142,6 +161,23 @@ public class AddEditBookController {
         dialogStage.close();
     }
 
+    @FXML
+    private void handleReset() {
+        if (existingBook == null) {
+            titleField.clear();
+            authorField.clear();
+            categoryCombo.setValue(null);
+            priceField.clear();
+            stockField.clear();
+            isbnField.clear();
+            yearField.clear();
+            descriptionArea.clear();
+        } else {
+            setBook(existingBook);
+        }
+        clearError();
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private void loadCategories() {
@@ -150,7 +186,13 @@ public class AddEditBookController {
             "Mystery", "Self-Help", "Biography", "History",
             "Science", "Business", "Children", "Other"
         );
+        categoryCombo.getItems().clear();
         categoryCombo.getItems().addAll(predefined);
+        for (String category : bookService.getAllCategories()) {
+            if (!categoryCombo.getItems().contains(category)) {
+                categoryCombo.getItems().add(category);
+            }
+        }
     }
 
     private void showError(String message) {
